@@ -35,7 +35,6 @@ func (s *GitEncoder) Run(sign chan bool) {
 func (s *GitEncoder) Shutdown(msg string) {
 	s.IsDown = true
 	s.Logger.Println(msg)
-	s.Logger.Println("autoencode is shutdown...")
 	s.Logger.Println(time.Now())
 }
 

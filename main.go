@@ -47,11 +47,13 @@ func main() {
 	}
 
 	// 启动daemon模式
+	var isDaemon bool
 	if len(os.Args) > 1 && os.Args[1] == "-d" {
 		_, err = daemon.Daemon(1, 0)
 		if err != nil {
 			log.Fatalln(err)
 		}
+		isDaemon = true
 	}
 
 	// 加载配置文件
@@ -61,10 +63,15 @@ func main() {
 	excludeList := parseExcludeList(dir + EXCLUDE_FILE)
 
 	// 初始化日志
-	logFileHandle, err := os.OpenFile(config["logFile"], os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
-	defer logFileHandle.Close()
-	if err != nil {
-		log.Fatalln(err.Error())
+	var logFileHandle *os.File
+	if isDaemon {
+		logFileHandle, err = os.OpenFile(config["logFile"], os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
+		defer logFileHandle.Close()
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
+	} else {
+		logFileHandle = os.Stderr
 	}
 	logger := log.New(logFileHandle, "", log.Ldate|log.Ltime)
 
